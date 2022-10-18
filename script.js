@@ -59,6 +59,9 @@ keys.addEventListener('click', (event) => {
     }
     if (target.classList.contains('all-clear-btn')){
         calculator.displayValue = 0
+        calculator.firstOperand = null
+        calculator.waitingSecondOperand = false
+        calculator.operator = null
         updateDisplay()
         return;
     }
@@ -89,12 +92,43 @@ function handleOperators(nextOperator) {
     const { firstOperand, displayValue, operator} = calculator;
     //convert displayValue to float-point value
     const inputValue = parseFloat(displayValue);
+
+    if(operator && calculate.waitingSecondOperand) {
+        calculator.operator = nextOperator;
+        console.log(calculator)
+        return;
+    }
+
+
     //verify if 'fisrtOperand' is null and if 'inputValue' is a 'NaN'
-    if (inputValue === null && !isNaN(inputValue)){
+    if (firstOperand === null && !isNaN(inputValue)){
         calculator.firstOperand = inputValue
-    };
+    } else if (operator) {
+        const result = calculate(firstOperand, inputValue, operator);
+        calculator.displayValue = String(result)
+        calculator.firstOperand = result
+        console.log(result)
+    }
     calculator.waitingSecondOperand = true;
     calculator.operator = nextOperator;
     console.log(calculator)
 
-} 
+}
+
+function calculate(firstOperand, secondOperand, operator) {
+    if (operator === '+') {
+      return firstOperand + secondOperand;
+    } else if (operator === '-') {
+      return firstOperand - secondOperand;
+    } else if (operator === '*') {
+      return firstOperand * secondOperand;
+    } else if (operator === '/') {
+        if(secondOperand === 0){
+            return 'Can\'t divide by 0'
+        } else{return firstOperand / secondOperand;}
+    }
+  
+    return secondOperand;
+  }
+
+
